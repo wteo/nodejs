@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 router.get('/form', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'views', 'form.html'));
+  res.render(path.join(__dirname, '..', 'views', 'form.ejs'));
 });
 
 router.post('/submit', (req, res) => {
