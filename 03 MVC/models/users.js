@@ -7,22 +7,30 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);  
 
 class UserModel {
-    constructor() {
+    constructor(callback) {
         this.dataFilePath = path.join(__dirname, '..', 'data', 'usernames.json');
-        this.usernames = this.loadUsersFromFile();
+        this.usernames = [];
+        this.loadUsersFromFile(callback);
     }
 
-    loadUsersFromFile() {
-        try {
-            const data = fs.readFileSync(this.dataFilePath, 'utf-8');
-            return JSON.parse(data);
-        } catch (error) {
-            return [];
-        }
+    loadUsersFromFile(callback) {
+        fs.readFile(this.dataFilePath, 'utf-8', (err, data) => {
+            if (err) {
+                console.error('Error reading from file:', err);
+                callback([]); // Return an empty array in case of an error
+            } else {
+                this.usernames = JSON.parse(data);
+                callback(this.usernames);
+            }
+        });
     }
 
     saveUsersToFile() {
-        fs.writeFileSync(this.dataFilePath, JSON.stringify(this.usernames, null, 2));
+        fs.writeFile(this.dataFilePath, JSON.stringify(this.usernames, null, 2), (err) => {
+            if (err) {
+                console.error('Error writing to file:', err);
+            }
+        });
     }
 
     addUser(name) {
@@ -35,4 +43,6 @@ class UserModel {
     }
 }
 
-export default new UserModel();
+export default new UserModel((usernames) => {
+    console.log("Usernames loaded:", usernames);
+});
